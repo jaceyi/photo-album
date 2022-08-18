@@ -1,3 +1,19 @@
 .input {
   display: none;
 }
+
+.popup {
+  .title {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: 666;
+
+    .text {
+      margin-left: 10px;
+      color: #666;
+    }
+  }
+
+
+}

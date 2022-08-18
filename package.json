@@ -16,8 +16,10 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@use-gesture/react": "^10.2.18",
+    "dayjs": "^1.11.5",
     "firebase": "^9.9.2",
     "react": "^18.2.0",
+    "react-alert-confirm": "^3.3.7",
     "react-dom": "^18.2.0",
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0"

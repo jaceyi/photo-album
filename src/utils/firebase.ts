@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator, signOut } from 'firebase/auth';
-import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
 const firebaseApp = initializeApp({
@@ -14,11 +14,11 @@ const firebaseApp = initializeApp({
 });
 
 export const auth = getAuth(firebaseApp);
-export const db = getDatabase(firebaseApp);
+export const db = getFirestore(firebaseApp);
 export const storage = getStorage(firebaseApp);
 
 if (location.hostname === 'localhost' && location.port === '6000') {
-  connectDatabaseEmulator(db, 'localhost', 6102);
+  connectFirestoreEmulator(db, 'localhost', 6102);
   connectStorageEmulator(storage, 'localhost', 6104);
   connectAuthEmulator(auth, 'http://localhost:6101');
 }

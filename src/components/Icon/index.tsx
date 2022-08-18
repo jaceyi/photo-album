@@ -5,7 +5,7 @@ import { animated, useSpring } from '@react-spring/web';
 import { useGesture } from '@use-gesture/react';
 
 // @ts-ignore
-import('//at.alicdn.com/t/c/font_3591956_y4cheh07mc.js');
+import('https://at.alicdn.com/t/c/font_3591956_y4cheh07mc.js');
 
 interface Props extends HTMLAttributes<HTMLButtonElement> {
   icon: string;

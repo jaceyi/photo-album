@@ -1,3 +1,4 @@
 export { default as Button } from './Button';
 export { default as Upload } from './Upload';
 export * from './Icon';
+export * from './Tag';
