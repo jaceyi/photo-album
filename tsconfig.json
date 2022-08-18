@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "ES2022",
+    "moduleResolution": "Node",
+    "jsx": "react",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "strictNullChecks": true
+  },
+  "include": ["src"]
+}

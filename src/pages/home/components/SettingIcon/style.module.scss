@@ -1,0 +1,26 @@
+.setting {
+  flex: none;
+  position: relative;
+
+  .setting {
+    padding: 6px;
+    display: flex;
+  }
+}
+
+.popover {
+  position: absolute;
+  right: 6px;
+  top: 46px;
+  padding: 8px;
+  background-color: #fff;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  z-index: 2;
+  font-size: 14px;
+  transform-origin: top right;
+
+  .item {
+    padding: 2px;
+  }
+}
