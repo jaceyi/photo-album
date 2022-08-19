@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { useDidMount } from '@/hooks';
-import * as styles from './style.module.scss';
+import styles from './style.module.scss';
 import SettingIcon from './components/SettingIcon';
 import { TagGroup } from '@/components';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
@@ -15,8 +15,6 @@ export interface Photo {
   tags: number[];
 }
 type Photos = Photo[];
-
-const { useState } = React;
 
 const Home = () => {
   const { tags = [] } = useConfig('options', {});

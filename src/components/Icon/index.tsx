@@ -1,5 +1,5 @@
-import * as React from 'react';
-import * as styles from './style.module.scss';
+import React from 'react';
+import styles from './style.module.scss';
 import { HTMLAttributes, CSSProperties } from 'react';
 import { animated, useSpring } from '@react-spring/web';
 import { useGesture } from '@use-gesture/react';

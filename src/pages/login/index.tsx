@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import { Icon } from '@/components';
-import * as styles from './style.module.scss';
+import styles from './style.module.scss';
 
 const Login = () => (
   <div>

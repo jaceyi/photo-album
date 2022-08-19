@@ -1,10 +1,10 @@
-import * as React from 'react';
-import * as styles from './style.module.scss';
+import React from 'react';
+import styles from './style.module.scss';
 import type { ReactNode, ChangeEvent } from 'react';
 import { doc, collection, setDoc } from 'firebase/firestore';
 import { storage, db } from '@/utils/firebase';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
-import * as day from 'dayjs';
+import day from 'dayjs';
 import alertConfirm from 'react-alert-confirm';
 import { Icon, IconButton, TagGroup } from '@/components';
 import { useConfig } from '@/hooks';

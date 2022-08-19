@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import routers from '@/router';
 import { useDidMount } from '@/hooks';
@@ -11,9 +11,7 @@ import {
   User
 } from 'firebase/auth';
 import { auth } from '@/utils/firebase';
-import * as styles from './app.module.scss';
-
-const { useState, useEffect } = React;
+import styles from './app.module.scss';
 
 const App = () => {
   const navigate = useNavigate();

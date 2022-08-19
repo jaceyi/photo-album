@@ -1,9 +1,7 @@
-import * as React from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { IconButton, Upload } from '@/components';
 import { animated, useSpring } from '@react-spring/web';
-import * as styles from './style.module.scss';
-
-const { useState, useCallback, useEffect } = React;
+import styles from './style.module.scss';
 
 const SettingIcon = () => {
   const [visible, setVisible] = useState(false);

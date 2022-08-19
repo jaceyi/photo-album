@@ -1,10 +1,8 @@
-import * as React from 'react';
-import * as styles from './style.module.scss';
+import React, { useState, useEffect } from 'react';
+import styles from './style.module.scss';
 import classNames from 'classnames';
 import { removeArrayItem } from '@/utils';
 import type { CSSProperties } from 'react';
-
-const { useState, useEffect } = React;
 
 interface Option {
   label: string;
