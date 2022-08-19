@@ -3,45 +3,59 @@ import { useDidMount } from '@/hooks';
 import * as styles from './style.module.scss';
 import SettingIcon from './components/SettingIcon';
 import { TagGroup } from '@/components';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/utils/firebase';
+import { useConfig } from '@/hooks';
 
-const {} = 'react';
+export interface Photo {
+  id: string;
+  url: string;
+  name: string;
+  created: number;
+  tags: number[];
+}
+type Photos = Photo[];
 
-const docRef = collection(db, 'photos');
+const { useState } = React;
 
 const Home = () => {
+  const { tags = [] } = useConfig('options', {});
+
+  const [data, setData] = useState<Photos>([]);
   useDidMount(async () => {
-    const querySnapshot = await getDocs(docRef);
-    querySnapshot.forEach(doc => {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, ' => ', doc.data());
-    });
+    const docRef = collection(db, 'photos');
+    const unsubscribe = onSnapshot(
+      query(docRef, orderBy('created', 'desc')),
+      querySnapshot => {
+        const data: Photos = [];
+        querySnapshot.forEach(doc => {
+          data.push({
+            id: doc.id,
+            ...doc.data()
+          } as Photo);
+        });
+        setData(data);
+      }
+    );
+    return () => {
+      unsubscribe();
+    };
   });
 
   return (
     <div>
       <div className={styles.header}>
-        <div className={styles.fast}></div>
+        <div className={styles.fast}>
+          <TagGroup options={tags} />
+        </div>
         <SettingIcon />
       </div>
-      <div>
-        <TagGroup
-          options={[
-            {
-              label: '正经图',
-              value: 1
-            },
-            {
-              label: '涩涩的',
-              value: 2
-            },
-            {
-              label: '不对劲',
-              value: 3
-            }
-          ]}
-        />
+      <div className={styles.container}>
+        {data.map(item => (
+          <div className={styles.photo} key={item.id}>
+            <img src={item.url} alt={item.name} />
+          </div>
+        ))}
       </div>
     </div>
   );

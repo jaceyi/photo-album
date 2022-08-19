@@ -7,16 +7,23 @@ import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import * as day from 'dayjs';
 import alertConfirm from 'react-alert-confirm';
 import { Icon, IconButton, TagGroup } from '@/components';
+import { useConfig } from '@/hooks';
 
 interface Props {
   children: ReactNode;
 }
 
-const photoRef = doc(collection(db, 'photos'));
+export const Upload = React.memo(({ children }: Props) => {
+  const { tags = [] } = useConfig('options', {});
 
-const Upload = ({ children }: Props) => {
   const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files || [];
+    const _fileList: File[] = [];
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
+      _fileList.push(file);
+    }
+    let tagValue: number[] = [];
     const [isOk] = await alertConfirm({
       maskClosable: true,
       className: styles.popup,
@@ -28,37 +35,25 @@ const Upload = ({ children }: Props) => {
       ),
       content: (
         <div>
-          <TagGroup
-            options={[
-              {
-                label: '正经图',
-                value: 1
-              },
-              {
-                label: '涩涩的',
-                value: 2
-              },
-              {
-                label: '不对劲',
-                value: 3
-              }
-            ]}
-          />
+          <TagGroup options={tags} onChange={v => (tagValue = v)} />
         </div>
       ),
       footer(dispatch) {
         return (
-          <IconButton
-            size={16}
-            onClick={() => dispatch('ok')}
-            icon="shangchuan"
-          />
+          <div className={styles.footer}>
+            <div className={styles.count}>已选择{_fileList.length}张图片</div>
+            <IconButton
+              size={16}
+              onClick={() => dispatch('ok')}
+              icon="shangchuan"
+            />
+          </div>
         );
       }
     });
     if (!isOk) return;
-    for (let i = 0; i < fileList.length; i++) {
-      const file = fileList[i];
+    for (let i = 0; i < _fileList.length; i++) {
+      const file = _fileList[i];
       const reader = new FileReader();
       reader.readAsDataURL(file);
       const src: string = await new Promise(reslove => {
@@ -70,9 +65,15 @@ const Upload = ({ children }: Props) => {
       const fileRef = ref(storage, `photos/${day().unix()}.${suffix}`);
       await uploadString(fileRef, src, 'data_url');
       const url = await getDownloadURL(fileRef);
+      const photoRef = doc(collection(db, 'photos'));
       setDoc(
         photoRef,
-        { url, name: file.name, created: day().unix() },
+        {
+          url,
+          name: file.name,
+          created: day().unix(),
+          tags: tagValue
+        },
         { merge: true }
       );
     }
@@ -92,6 +93,4 @@ const Upload = ({ children }: Props) => {
       {children}
     </label>
   );
-};
-
-export default React.memo(Upload);
+});

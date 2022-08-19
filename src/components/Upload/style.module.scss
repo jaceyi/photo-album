@@ -15,5 +15,14 @@
     }
   }
 
+  .footer {
+    flex: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
+    .count {
+      color: #999;
+    }
+  }
 }
