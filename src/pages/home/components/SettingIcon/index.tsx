@@ -3,7 +3,20 @@ import { IconButton, Upload } from '@/components';
 import { animated, useSpring } from '@react-spring/web';
 import styles from './style.module.scss';
 
-const SettingIcon = () => {
+export namespace TSettingIcon {
+  interface SelectOption {
+    type: string;
+    payload?: any;
+  }
+  export interface onSelect {
+    (option: SelectOption): void;
+  }
+  export interface Props {
+    onSelect: onSelect;
+  }
+}
+
+const SettingIcon = ({ onSelect }: TSettingIcon.Props) => {
   const [visible, setVisible] = useState(false);
   const style = useSpring({
     scale: visible ? 1 : 0,
@@ -35,16 +48,19 @@ const SettingIcon = () => {
       </div>
       <animated.div className={styles.popover} style={style}>
         <div className={styles.item}>
-          <IconButton icon="sousuo" />
+          <IconButton
+            icon="fenlei"
+            onClick={() => onSelect({ type: 'layout' })}
+          />
         </div>
         <div className={styles.item}>
-          <IconButton icon="biaoqian" />
+          <IconButton icon="sousuo" />
         </div>
         <div className={styles.item}>
           <IconButton icon="shijian" />
         </div>
         <div className={styles.item}>
-          <IconButton icon="ziliao" />
+          <IconButton icon="bofang" />
         </div>
         <div className={styles.item}>
           <Upload>

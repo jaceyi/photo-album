@@ -31,7 +31,7 @@ const TagGroup = React.memo(({ options, onChange, value }: TagGroup) => {
         const activated = _value.find(v => v === itemValue);
         const style: CSSProperties = {};
         if (activated) {
-          style.backgroundColor = color;
+          style.borderColor = color;
         }
         return (
           <div
