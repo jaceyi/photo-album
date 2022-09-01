@@ -54,13 +54,23 @@ const SettingIcon = ({ onSelect }: TSettingIcon.Props) => {
           />
         </div>
         <div className={styles.item}>
+          <IconButton
+            icon="biaoqian"
+            onClick={() => onSelect({ type: 'tag' })}
+          />
+        </div>
+        {/* <div className={styles.item}>
           <IconButton icon="sousuo" />
         </div>
         <div className={styles.item}>
           <IconButton icon="shijian" />
         </div>
+         */}
         <div className={styles.item}>
-          <IconButton icon="bofang" />
+          <IconButton
+            icon="bofang"
+            onClick={() => onSelect({ type: 'play' })}
+          />
         </div>
         <div className={styles.item}>
           <Upload>

@@ -1,4 +1,5 @@
 import 'react-alert-confirm/dist/index.css';
+import 'react-photo-view/dist/react-photo-view.css';
 import './base.scss';
 import React from 'react';
 import ReactDOM from 'react-dom/client';

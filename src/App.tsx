@@ -11,7 +11,6 @@ import {
   User
 } from 'firebase/auth';
 import { auth } from '@/utils/firebase';
-import styles from './app.module.scss';
 
 const App = () => {
   const navigate = useNavigate();
@@ -40,7 +39,7 @@ const App = () => {
   });
 
   return (
-    <div className={styles.app}>
+    <div>
       <Routes>
         {routers.map(({ path, Component }) => (
           <Route key={path} path={path} element={<Component />} />

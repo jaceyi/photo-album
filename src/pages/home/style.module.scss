@@ -3,13 +3,24 @@
   justify-content: space-between;
   align-items: center;
   padding: 4px 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 9;
 }
 
 .container {
-  margin: 10px;
+  margin: 10px 10px;
 
   .col {
     transition: left 0.3s, top 0.3s;
+    display: flex;
+    justify-content: center;
+
+    img {
+      max-width: 100%;
+    }
   }
 
   .photo {
