@@ -5,10 +5,10 @@ import React, {
   useEffect,
   useRef
 } from 'react';
-import { useDidMount } from '@/hooks';
+import { useDidMount, useScrollEnd } from '@/hooks';
 import styles from './style.module.scss';
 import SettingIcon, { TSettingIcon } from './components/SettingIcon';
-import { TagGroup } from '@/components';
+import { IconLoading, TagGroup } from '@/components';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/utils/firebase';
 import { useConfig } from '@/hooks';
@@ -30,6 +30,7 @@ const Home = () => {
   const { tags = [] } = useConfig('options', {});
   const [tagValue, setTagValue] = useState([]);
 
+  const [fullData, setFullData] = useState<Photos>([]);
   const [data, setData] = useState<Photos>([]);
   useDidMount(async () => {
     const docRef = collection(db, 'photos');
@@ -43,13 +44,37 @@ const Home = () => {
             ...doc.data()
           } as Photo);
         });
-        setData(data);
+        setFullData(data);
+        setData(data.slice(0, 10));
       }
     );
     return () => {
       unsubscribe();
     };
   });
+  const [loadingEnd, setLoadingEnd] = useState(false);
+  const loadingEndStyle = useSpring({
+    marginBottom: loadingEnd ? -100 : 0
+  });
+  useScrollEnd(
+    count => {
+      return new Promise((resolve, reject) => {
+        let newData: Photos = [];
+        setData(data => {
+          newData = [...data, ...fullData.slice(count * 10, (count + 1) * 10)];
+          return newData;
+        });
+        if (newData.length >= fullData.length) {
+          setLoadingEnd(true);
+          reject('scroll end');
+        } else {
+          setLoadingEnd(false);
+          resolve(newData);
+        }
+      });
+    },
+    [fullData]
+  );
 
   const [layoutCol, setLayoutCol] = useState<number>(
     () => LocalDB.get('layoutCol') || 2
@@ -81,17 +106,19 @@ const Home = () => {
         break;
       case 'tag':
         setTagVisible(v => !v);
+        break;
       case 'play':
         setVisible(true);
         setPlaying(true);
+        break;
     }
   }, []);
 
   const macyRef = useRef<any>();
-  const containerRef = useRef(null);
+  const mainRef = useRef(null);
   useEffect(() => {
     const macy: any = new Macy({
-      container: containerRef.current,
+      container: mainRef.current,
       columns: layoutCol,
       margin: 10
     });
@@ -104,6 +131,7 @@ const Home = () => {
   }, [data, tagValue]);
 
   useEffect(() => {
+    setIndex(0);
     macyRef.current.runOnImageLoad(() => {
       macyRef.current.recalculate(true);
     }, true);
@@ -115,7 +143,7 @@ const Home = () => {
       clearInterval(playTimer.current);
       playTimer.current = window.setInterval(() => {
         setIndex(i => (i === dataSource.length - 1 ? 0 : i + 1));
-      }, 2000);
+      }, 3000);
       return;
     }
     if (!visible && playing) {
@@ -125,7 +153,7 @@ const Home = () => {
   }, [visible, playing, dataSource]);
 
   return (
-    <div>
+    <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.fast}>
           <animated.div style={tagStyles}>
@@ -143,9 +171,9 @@ const Home = () => {
         index={index}
         onIndexChange={setIndex}
       >
-        <div ref={containerRef} className={styles.container}>
-          {dataSource.map(item => (
-            <div key={item.id} className={styles.col}>
+        <div ref={mainRef} className={styles.main}>
+          {dataSource.map((item, index) => (
+            <div key={`${item.id}-${index}`} className={styles.col}>
               <PhotoView src={item.url}>
                 <img src={item.url} alt="" />
               </PhotoView>
@@ -153,6 +181,10 @@ const Home = () => {
           ))}
         </div>
       </PhotoProvider>
+      <animated.div style={loadingEndStyle} className={styles.loading}>
+        <IconLoading />
+        <span>加载中</span>
+      </animated.div>
     </div>
   );
 };

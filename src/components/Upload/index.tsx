@@ -29,7 +29,7 @@ export const Upload = React.memo(({ children }: Props) => {
       className: styles.popup,
       title: (
         <div className={styles.title}>
-          <Icon size={12} icon="biaoqian" />
+          <Icon size={32} icon="biaoqian" />
           <span className={styles.text}>选择标签</span>
         </div>
       ),
@@ -43,7 +43,7 @@ export const Upload = React.memo(({ children }: Props) => {
           <div className={styles.footer}>
             <div className={styles.count}>已选择{_fileList.length}张图片</div>
             <IconButton
-              size={16}
+              size={46}
               onClick={() => dispatch('ok')}
               icon="shangchuan"
             />

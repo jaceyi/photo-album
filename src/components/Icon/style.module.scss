@@ -3,8 +3,8 @@
 }
 
 .icon {
-  width: 3em;
-  height: 3em;
+  width: 1em;
+  height: 1em;
   vertical-align: -0.12em;
   fill: currentColor;
   overflow: hidden;
@@ -12,4 +12,22 @@
 
 .button {
   border-radius: 9em;
+}
+
+.IconLoading {
+  color: #999;
+
+  &.loading {
+    animation: 1s linear 0s infinite normal rotate;
+
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  }
 }

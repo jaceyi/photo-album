@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from './style.module.scss';
-import { HTMLAttributes, CSSProperties } from 'react';
+import type { HTMLAttributes, CSSProperties } from 'react';
 import { animated, useSpring } from '@react-spring/web';
 import { useGesture } from '@use-gesture/react';
+import classNames from 'classnames';
 
 // @ts-ignore
-import('https://at.alicdn.com/t/c/font_3591956_y4cheh07mc.js');
+import('https://at.alicdn.com/t/c/font_3591956_7njwpa4f0pm.js');
 
 interface Props extends HTMLAttributes<HTMLButtonElement> {
   icon: string;
@@ -48,7 +49,25 @@ export const IconButton = React.memo((props: Props) => {
 
   return (
     <animated.div className={styles.button} {...bind()} style={style}>
-      <Icon {...props} />
+      <Icon size={50} {...props} />
     </animated.div>
   );
 });
+
+interface IconLoadingProps {
+  loading?: boolean;
+}
+
+export const IconLoading = React.memo(
+  ({ loading = true }: IconLoadingProps) => {
+    return (
+      <span
+        className={classNames('loading-icon', styles.IconLoading, {
+          [styles.loading]: loading
+        })}
+      >
+        <Icon size={16} icon="loading" />
+      </span>
+    );
+  }
+);
