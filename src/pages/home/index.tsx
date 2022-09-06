@@ -9,13 +9,22 @@ import { useDidMount, useScrollEnd } from '@/hooks';
 import styles from './style.module.scss';
 import SettingIcon, { TSettingIcon } from './components/SettingIcon';
 import { IconLoading, TagGroup } from '@/components';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  doc,
+  deleteDoc
+} from 'firebase/firestore';
 import { db } from '@/utils/firebase';
 import { useConfig } from '@/hooks';
 import Macy from 'macy';
 import LocalDB from '@/libs/LocalDB';
 import { useSpring, animated } from '@react-spring/web';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
+import { IconButton } from '@/components';
+import alertConfirm from 'react-alert-confirm';
 
 export interface Photo {
   id: string;
@@ -37,44 +46,45 @@ const Home = () => {
     const unsubscribe = onSnapshot(
       query(docRef, orderBy('created', 'desc')),
       querySnapshot => {
-        const data: Photos = [];
+        const fullData: Photos = [];
         querySnapshot.forEach(doc => {
-          data.push({
+          fullData.push({
             id: doc.id,
             ...doc.data()
           } as Photo);
         });
-        setFullData(data);
-        setData(data.slice(0, 10));
+        setFullData(fullData);
       }
     );
     return () => {
       unsubscribe();
     };
   });
+  useEffect(() => {
+    setData(data => {
+      return fullData.slice(0, data.length < 10 ? 10 : data.length);
+    });
+  }, [fullData]);
   const [loadingEnd, setLoadingEnd] = useState(false);
   const loadingEndStyle = useSpring({
     marginBottom: loadingEnd ? -100 : 0
   });
-  useScrollEnd(
-    count => {
-      return new Promise((resolve, reject) => {
-        let newData: Photos = [];
-        setData(data => {
-          newData = [...data, ...fullData.slice(count * 10, (count + 1) * 10)];
-          return newData;
-        });
-        if (newData.length >= fullData.length) {
-          setLoadingEnd(true);
-          reject('scroll end');
-        } else {
-          setLoadingEnd(false);
-          resolve(newData);
-        }
+  useScrollEnd(() => {
+    return new Promise((resolve, reject) => {
+      let newData: Photos = [];
+      setData(data => {
+        newData = [...data, ...fullData.slice(data.length, data.length + 10)];
+        return newData;
       });
-    },
-    [fullData]
-  );
+      if (newData.length >= fullData.length) {
+        setLoadingEnd(true);
+        reject('scroll end');
+      } else {
+        setLoadingEnd(false);
+        resolve(newData);
+      }
+    });
+  }, [fullData]);
 
   const [layoutCol, setLayoutCol] = useState<number>(
     () => LocalDB.get('layoutCol') || 2
@@ -131,10 +141,15 @@ const Home = () => {
   }, [data, tagValue]);
 
   useEffect(() => {
-    setIndex(0);
-    macyRef.current.runOnImageLoad(() => {
-      macyRef.current.recalculate(true);
-    }, true);
+    if (dataSource.length) {
+      setIndex(index => {
+        if (dataSource[index]) return index;
+        return index - 1;
+      });
+      macyRef.current.runOnImageLoad(() => {
+        macyRef.current.recalculate(true);
+      }, true);
+    }
   }, [dataSource]);
 
   const playTimer = useRef<number>(0);
@@ -151,6 +166,18 @@ const Home = () => {
       setPlaying(false);
     }
   }, [visible, playing, dataSource]);
+
+  const handleDelete = async () => {
+    const [isOk] = await alertConfirm({
+      title: '提示',
+      content: '确认删除该照片？'
+    });
+    if (isOk) {
+      const active = data[index];
+      if (!active) return;
+      deleteDoc(doc(db, 'photos', active.id));
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -170,12 +197,21 @@ const Home = () => {
         }}
         index={index}
         onIndexChange={setIndex}
+        toolbarRender={() => {
+          return (
+            <div style={{ marginRight: 10 }}>
+              <IconButton onClick={handleDelete} icon="qingchu" size={38} />
+            </div>
+          );
+        }}
       >
         <div ref={mainRef} className={styles.main}>
           {dataSource.map((item, index) => (
             <div key={`${item.id}-${index}`} className={styles.col}>
               <PhotoView src={item.url}>
-                <img src={item.url} alt="" />
+                <div className={styles.photo}>
+                  <img src={item.url} alt="" />
+                </div>
               </PhotoView>
             </div>
           ))}

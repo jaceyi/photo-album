@@ -49,7 +49,7 @@ export const IconButton = React.memo((props: Props) => {
 
   return (
     <animated.div className={styles.button} {...bind()} style={style}>
-      <Icon size={50} {...props} />
+      <Icon size={46} {...props} />
     </animated.div>
   );
 });

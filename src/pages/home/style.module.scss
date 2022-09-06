@@ -30,9 +30,8 @@
   }
 
   .photo {
-    margin-bottom: 10px;
-    box-shadow: 1px 1px 4px rgba($color: #000000, $alpha: 0.1);
     display: flex;
+    border: 1px solid #f3f3f3;
 
     &:last-child {
       margin-bottom: 0;
