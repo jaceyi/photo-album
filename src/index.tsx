@@ -1,4 +1,4 @@
-import 'react-alert-confirm/dist/index.css';
+import 'react-alert-confirm/lib/style.css';
 import 'react-photo-view/dist/react-photo-view.css';
 import './base.scss';
 import React from 'react';

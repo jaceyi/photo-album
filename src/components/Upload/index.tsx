@@ -33,7 +33,7 @@ export const Upload = React.memo(({ children }: Props) => {
           <span className={styles.text}>选择标签</span>
         </div>
       ),
-      content: (
+      desc: (
         <div>
           <TagGroup options={tags} onChange={v => (tagValue = v)} />
         </div>

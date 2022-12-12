@@ -170,7 +170,7 @@ const Home = () => {
   const handleDelete = async () => {
     const [isOk] = await alertConfirm({
       title: '提示',
-      content: '确认删除该照片？'
+      desc: '确认删除该照片？'
     });
     if (isOk) {
       const active = data[index];
