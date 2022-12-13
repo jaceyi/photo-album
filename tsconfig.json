@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES5",
-    "module": "ES2022",
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true,
+    "lib": ["es2020", "dom"],
     "jsx": "react",
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     },
-    "strictNullChecks": true
+    "strict": true,
+    "downlevelIteration": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src"]
 }

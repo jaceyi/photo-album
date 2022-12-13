@@ -22,9 +22,9 @@ import { useConfig } from '@/hooks';
 import Macy from 'macy';
 import LocalDB from '@/libs/LocalDB';
 import { useSpring, animated } from '@react-spring/web';
-import { PhotoProvider, PhotoView } from 'react-photo-view';
+import { PhotoSlider } from 'react-photo-view';
 import { IconButton } from '@/components';
-import alertConfirm from 'react-alert-confirm';
+import AlertConfirm from 'react-alert-confirm';
 
 export interface Photo {
   id: string;
@@ -41,6 +41,7 @@ const Home = () => {
 
   const [fullData, setFullData] = useState<Photos>([]);
   const [data, setData] = useState<Photos>([]);
+  const [errorMessage, setErrorMessage] = useState('');
   useDidMount(async () => {
     const docRef = collection(db, 'photos');
     const unsubscribe = onSnapshot(
@@ -54,6 +55,9 @@ const Home = () => {
           } as Photo);
         });
         setFullData(fullData);
+      },
+      err => {
+        setErrorMessage(err.message);
       }
     );
     return () => {
@@ -168,16 +172,25 @@ const Home = () => {
   }, [visible, playing, dataSource]);
 
   const handleDelete = async () => {
-    const [isOk] = await alertConfirm({
-      title: '提示',
-      desc: '确认删除该照片？'
-    });
+    const [isOk] = await AlertConfirm('确认删除该照片？');
     if (isOk) {
       const active = data[index];
       if (!active) return;
       deleteDoc(doc(db, 'photos', active.id));
     }
   };
+
+  if (errorMessage) {
+    return (
+      <div className={styles.error}>
+        <h2>错误：</h2>
+        <p>{errorMessage}</p>
+        <div>
+          <a href="/">返回重试</a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -189,11 +202,29 @@ const Home = () => {
         </div>
         <SettingIcon onSelect={handleSetting} />
       </div>
-      <PhotoProvider
+      <div ref={mainRef} className={styles.main}>
+        {dataSource.map((item, index) => (
+          <div key={`${item.id}-${index}`} className={styles.col}>
+            <div
+              onClick={() => {
+                setVisible(true);
+                setIndex(index);
+              }}
+              className={styles.photo}
+            >
+              <img src={item.url} alt="" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <PhotoSlider
+        images={dataSource.map((item, index) => ({
+          src: item.url,
+          key: `${item.id}-${index}`
+        }))}
         visible={visible}
-        onVisibleChange={(visible, index) => {
-          setVisible(visible);
-          visible && setIndex(index);
+        onClose={() => {
+          setVisible(false);
         }}
         index={index}
         onIndexChange={setIndex}
@@ -204,19 +235,7 @@ const Home = () => {
             </div>
           );
         }}
-      >
-        <div ref={mainRef} className={styles.main}>
-          {dataSource.map((item, index) => (
-            <div key={`${item.id}-${index}`} className={styles.col}>
-              <PhotoView src={item.url}>
-                <div className={styles.photo}>
-                  <img src={item.url} alt="" />
-                </div>
-              </PhotoView>
-            </div>
-          ))}
-        </div>
-      </PhotoProvider>
+      />
       <animated.div style={loadingEndStyle} className={styles.loading}>
         <IconLoading />
         <span>加载中</span>

@@ -1,7 +1,11 @@
+interface Data {
+  [key: string]: any
+}
+
 class LocalDB {
   static localName = 'PHOTO_FRONT_DB';
 
-  static getFull(): object {
+  static getFull(): Data {
     const dataStr = localStorage.getItem(LocalDB.localName) || '';
     try {
       return JSON.parse(dataStr) || {};
@@ -22,7 +26,7 @@ class LocalDB {
     localStorage.setItem(LocalDB.localName, JSON.stringify(data));
   }
 
-  static set(key: string, value) {
+  static set(key: string, value: any) {
     const data = LocalDB.getFull();
     LocalDB.setFull({
       ...data,
@@ -37,15 +41,14 @@ class LocalDB {
     LocalDB.setFull(data);
   }
 
-  constructor(public scope: string, initialValue) {
+  constructor(public scope: string, initialValue: Data) {
     if (!LocalDB.get(scope)) {
       LocalDB.set(scope, initialValue);
     }
   }
 
-  setFull(data) {
+  setFull(data: Data) {
     LocalDB.set(this.scope, data);
-    this.watchCallbacks.forEach(callback => callback(data));
     return this;
   }
 
@@ -62,11 +65,11 @@ class LocalDB {
     return this;
   }
 
-  getFull(): object {
+  getFull(): Data {
     return LocalDB.get(this.scope);
   }
 
-  get(key: string, initialValue?) {
+  get(key: string, initialValue?: Data) {
     return this.getFull()?.[key] || initialValue;
   }
 
@@ -84,20 +87,6 @@ class LocalDB {
 
   clear() {
     LocalDB.remove(this.scope);
-  }
-
-  // 监听变化
-  watchCallbacks: Function[] = [];
-  watch(callback: Function) {
-    if (!this.watchCallbacks.find(call => call === callback)) {
-      this.watchCallbacks.push(callback);
-    }
-  }
-  removeWatch(callback: Function) {
-    let index;
-    if ((index = this.watchCallbacks.indexOf(callback) !== -1)) {
-      this.watchCallbacks.splice(index, 1);
-    }
   }
 }
 

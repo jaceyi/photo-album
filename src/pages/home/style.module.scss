@@ -57,3 +57,23 @@
     }
   }
 }
+
+.error {
+  margin: 10vh auto 0;
+  color: #ea475a;
+  border: 1px solid #ea475a;
+  padding: 20px;
+  width: 90vw;
+  border-radius: 4px;
+  background: #fff1f1;
+
+  p {
+    margin-top: 6px;
+  }
+
+  div {
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: right;
+  }
+}

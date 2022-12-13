@@ -8,6 +8,7 @@ import {
   signInWithRedirect,
   GoogleAuthProvider,
   onAuthStateChanged,
+  signOut,
   User
 } from 'firebase/auth';
 import { auth } from '@/utils/firebase';
@@ -22,8 +23,9 @@ const App = () => {
   }, [user]);
 
   useDidMount(() => {
-    onAuthStateChanged(auth, async (user: User) => {
+    onAuthStateChanged(auth, async user => {
       if (user) {
+        (window as any).signOut = () => signOut(auth);
         setUser(user);
       } else {
         try {

@@ -1,3 +1,4 @@
+import type { MouseEventHandler } from 'react';
 import React, { useState, useCallback, useEffect } from 'react';
 import { IconButton, Upload } from '@/components';
 import { animated, useSpring } from '@react-spring/web';
@@ -33,7 +34,7 @@ const SettingIcon = ({ onSelect }: TSettingIcon.Props) => {
     return () => document.body.removeEventListener('click', hidden);
   }, [visible]);
 
-  const handleTabVisible = useCallback(
+  const handleTabVisible = useCallback<MouseEventHandler<HTMLButtonElement>>(
     e => {
       e.stopPropagation();
       setVisible(!visible);

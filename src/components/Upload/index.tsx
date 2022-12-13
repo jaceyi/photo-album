@@ -5,7 +5,7 @@ import { doc, collection, setDoc } from 'firebase/firestore';
 import { storage, db } from '@/utils/firebase';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import day from 'dayjs';
-import alertConfirm from 'react-alert-confirm';
+import AlertConfirm from 'react-alert-confirm';
 import { Icon, IconButton, TagGroup } from '@/components';
 import { useConfig } from '@/hooks';
 
@@ -24,7 +24,7 @@ export const Upload = React.memo(({ children }: Props) => {
       _fileList.push(file);
     }
     let tagValue: number[] = [];
-    const [isOk] = await alertConfirm({
+    const [isOk] = await AlertConfirm({
       maskClosable: true,
       className: styles.popup,
       title: (

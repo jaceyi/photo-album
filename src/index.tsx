@@ -7,10 +7,11 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import config from './config.json';
 import './utils/firebase';
-import alertConfirm from 'react-alert-confirm';
+import AlertConfirm from 'react-alert-confirm';
 
-alertConfirm.config({
-  zIndex: 999999999
+AlertConfirm.config({
+  zIndex: 999999999,
+  lang: 'zh'
 });
 
 console.log(`version: ${config.version}`);

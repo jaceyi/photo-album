@@ -12,7 +12,7 @@ interface Option {
 
 interface TagGroup {
   options: Option[];
-  onChange?: Function;
+  onChange?: (value: any) => void;
   value?: any[];
 }
 
