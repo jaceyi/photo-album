@@ -14,6 +14,8 @@ const firebaseApp = initializeApp({
 });
 
 export const auth = getAuth(firebaseApp);
+auth.languageCode = 'zh';
+
 export const db = getFirestore(firebaseApp);
 export const storage = getStorage(firebaseApp);
 
