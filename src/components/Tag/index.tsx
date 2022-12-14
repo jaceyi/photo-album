@@ -10,13 +10,13 @@ interface Option {
   color: string;
 }
 
-interface TagGroup {
+interface TagGroupProps {
   options: Option[];
   onChange?: (value: any) => void;
   value?: any[];
 }
 
-const TagGroup = React.memo(({ options, onChange, value }: TagGroup) => {
+const TagGroup = React.memo<TagGroupProps>(({ options, onChange, value }) => {
   const [_value, _setValue] = useState<any[]>(value || []);
   useEffect(() => {
     if (value !== _value) {

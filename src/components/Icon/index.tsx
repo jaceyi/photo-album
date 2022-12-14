@@ -10,13 +10,11 @@ import('https://at.alicdn.com/t/c/font_3591956_7njwpa4f0pm.js');
 
 interface Props extends HTMLAttributes<HTMLButtonElement> {
   icon: string;
-  className?: string;
   size?: string | number;
-  style?: CSSProperties;
 }
 
-export const Icon = React.memo(
-  ({ icon, className = '', size, style = {}, ...rest }: Props) => {
+export const Icon = React.memo<Props>(
+  ({ icon, className = '', size, style = {}, ...rest }) => {
     const _style: CSSProperties = style;
     if (size !== undefined) {
       _style.fontSize = size;
@@ -32,7 +30,7 @@ export const Icon = React.memo(
   }
 );
 
-export const IconButton = React.memo((props: Props) => {
+export const IconButton = React.memo<Props>(props => {
   const [style, set] = useSpring(() => ({
     scale: 1,
     rotate: 0
@@ -54,19 +52,20 @@ export const IconButton = React.memo((props: Props) => {
   );
 });
 
-interface IconLoadingProps {
+interface SpinProps extends Omit<Props, 'icon'> {
   loading?: boolean;
+  icon?: string;
 }
 
-export const IconLoading = React.memo(
-  ({ loading = true }: IconLoadingProps) => {
+export const Spin = React.memo<SpinProps>(
+  ({ loading = true, size = 16, icon = 'loading', ...props }) => {
     return (
       <span
-        className={classNames('loading-icon', styles.IconLoading, {
+        className={classNames('loading-icon', styles.spin, {
           [styles.loading]: loading
         })}
       >
-        <Icon size={16} icon="loading" />
+        <Icon size={size} icon={icon} {...props} />
       </span>
     );
   }

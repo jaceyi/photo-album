@@ -13,7 +13,7 @@ interface Props {
   children: ReactNode;
 }
 
-export const Upload = React.memo(({ children }: Props) => {
+export const Upload = React.memo<Props>(({ children }) => {
   const { tags = [] } = useConfig('options', {});
 
   const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {

@@ -5,8 +5,8 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
   styleType?: 'default' | 'primary';
 }
 
-export const Button = React.memo(
-  ({ className, styleType = 'default', ...props }: Props) => {
+export const Button = React.memo<Props>(
+  ({ className, styleType = 'default', ...props }) => {
     return (
       <button
         type="button"

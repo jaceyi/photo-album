@@ -8,7 +8,7 @@ import React, {
 import { useDidMount, useScrollEnd } from '@/hooks';
 import styles from './style.module.scss';
 import SettingIcon, { TSettingIcon } from './components/SettingIcon';
-import { IconLoading, TagGroup } from '@/components';
+import { Spin, TagGroup } from '@/components';
 import {
   collection,
   onSnapshot,
@@ -237,7 +237,7 @@ const Home = () => {
         }}
       />
       <animated.div style={loadingEndStyle} className={styles.loading}>
-        <IconLoading />
+        <Spin />
         <span>加载中</span>
       </animated.div>
     </div>
