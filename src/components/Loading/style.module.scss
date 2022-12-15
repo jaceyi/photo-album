@@ -1,0 +1,13 @@
+.loading {
+  text-align: center;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  :global {
+    .loading-icon {
+      margin-right: 4px;
+    }
+  }
+}

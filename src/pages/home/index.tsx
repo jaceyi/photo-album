@@ -8,7 +8,6 @@ import React, {
 import { useDidMount, useScrollEnd } from '@/hooks';
 import styles from './style.module.scss';
 import SettingIcon, { TSettingIcon } from './components/SettingIcon';
-import { Spin, TagGroup } from '@/components';
 import {
   collection,
   onSnapshot,
@@ -23,7 +22,7 @@ import Macy from 'macy';
 import LocalDB from '@/libs/LocalDB';
 import { useSpring, animated } from '@react-spring/web';
 import { PhotoSlider } from 'react-photo-view';
-import { IconButton } from '@/components';
+import { TagGroup, IconButton, Loading } from '@/components';
 import AlertConfirm from 'react-alert-confirm';
 
 export interface Photo {
@@ -237,8 +236,7 @@ const Home = () => {
         }}
       />
       <animated.div style={loadingEndStyle} className={styles.loading}>
-        <Spin />
-        <span>加载中</span>
+        <Loading />
       </animated.div>
     </div>
   );
