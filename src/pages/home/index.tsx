@@ -5,15 +5,17 @@ import React, {
   useEffect,
   useRef
 } from 'react';
-import { useDidMount, useScrollEnd } from '@/hooks';
+import { useDidMount } from '@/hooks';
 import styles from './style.module.scss';
-import SettingIcon, { TSettingIcon } from './components/SettingIcon';
+import SettingIcon, { onSettingSelect } from './components/SettingIcon';
+import LoadPhoto, { Photo, PHOTO_MARGIN } from './components/LoadPhoto';
 import {
   collection,
   onSnapshot,
   query,
   orderBy,
   doc,
+  getDoc,
   deleteDoc
 } from 'firebase/firestore';
 import { db } from '@/utils/firebase';
@@ -25,69 +27,55 @@ import { PhotoSlider } from 'react-photo-view';
 import { TagGroup, IconButton, Loading } from '@/components';
 import AlertConfirm from 'react-alert-confirm';
 
-export interface Photo {
-  id: string;
-  url: string;
-  name: string;
-  created: number;
-  tags: number[];
-}
 type Photos = Photo[];
 
 const Home = () => {
   const { tags = [] } = useConfig('options', {});
-  const [tagValue, setTagValue] = useState([]);
+  const [tagValue, setTagValue] = useState<[]>(
+    () => LocalDB.get('tagValue') || []
+  );
+  useEffect(() => {
+    LocalDB.set('tagValue', tagValue);
+  }, [tagValue]);
 
-  const [fullData, setFullData] = useState<Photos>([]);
   const [data, setData] = useState<Photos>([]);
   const [errorMessage, setErrorMessage] = useState('');
+  const [footerText, setFooterText] = useState('');
   useDidMount(async () => {
     const docRef = collection(db, 'photos');
     const unsubscribe = onSnapshot(
       query(docRef, orderBy('created', 'desc')),
       querySnapshot => {
-        const fullData: Photos = [];
+        const data: Photos = [];
         querySnapshot.forEach(doc => {
-          fullData.push({
+          data.push({
             id: doc.id,
             ...doc.data()
           } as Photo);
         });
-        setFullData(fullData);
+        setData(data);
       },
       err => {
         setErrorMessage(err.message);
       }
     );
+
+    {
+      const docRef = doc(db, 'config', 'footer');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setFooterText(docSnap.data().text);
+      }
+    }
     return () => {
       unsubscribe();
     };
   });
-  useEffect(() => {
-    setData(data => {
-      return fullData.slice(0, data.length < 10 ? 10 : data.length);
-    });
-  }, [fullData]);
   const [loadingEnd, setLoadingEnd] = useState(false);
   const loadingEndStyle = useSpring({
-    marginBottom: loadingEnd ? -100 : 0
+    height: loadingEnd ? 0 : 60,
+    opacity: loadingEnd ? 0 : 1
   });
-  useScrollEnd(() => {
-    return new Promise((resolve, reject) => {
-      let newData: Photos = [];
-      setData(data => {
-        newData = [...data, ...fullData.slice(data.length, data.length + 10)];
-        return newData;
-      });
-      if (newData.length >= fullData.length) {
-        setLoadingEnd(true);
-        reject('scroll end');
-      } else {
-        setLoadingEnd(false);
-        resolve(newData);
-      }
-    });
-  }, [fullData]);
 
   const [layoutCol, setLayoutCol] = useState<number>(
     () => LocalDB.get('layoutCol') || 2
@@ -108,7 +96,7 @@ const Home = () => {
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
 
-  const handleSetting = useCallback<TSettingIcon.onSelect>(({ type }) => {
+  const handleSetting = useCallback<onSettingSelect>(({ type }) => {
     switch (type) {
       case 'layout':
         setLayoutCol(v => {
@@ -123,17 +111,20 @@ const Home = () => {
       case 'play':
         setVisible(true);
         setPlaying(true);
+      case 'sort':
+        setData(data => [...data.reverse()]);
         break;
     }
   }, []);
 
-  const macyRef = useRef<any>();
+  const macyRef = useRef<Macy>();
   const mainRef = useRef(null);
   useEffect(() => {
+    if (!mainRef.current) return;
     const macy: any = new Macy({
       container: mainRef.current,
       columns: layoutCol,
-      margin: 10
+      margin: PHOTO_MARGIN
     });
     macyRef.current = macy;
   }, [layoutCol]);
@@ -144,19 +135,20 @@ const Home = () => {
   }, [data, tagValue]);
 
   useEffect(() => {
+    if (!macyRef.current) return;
     if (dataSource.length) {
       setIndex(index => {
         if (dataSource[index]) return index;
         return index - 1;
       });
-      macyRef.current.runOnImageLoad(() => {
-        macyRef.current.recalculate(true);
-      }, true);
+      macyRef.current.recalculate(true);
     }
-  }, [dataSource]);
+  }, [dataSource, macyRef.current]);
 
   const playTimer = useRef<number>(0);
   useEffect(() => {
+    setLoadingEnd(false);
+
     if (visible && playing) {
       clearInterval(playTimer.current);
       playTimer.current = window.setInterval(() => {
@@ -204,15 +196,19 @@ const Home = () => {
       <div ref={mainRef} className={styles.main}>
         {dataSource.map((item, index) => (
           <div key={`${item.id}-${index}`} className={styles.col}>
-            <div
+            <LoadPhoto
+              data={item}
+              layoutCol={layoutCol}
               onClick={() => {
                 setVisible(true);
                 setIndex(index);
               }}
-              className={styles.photo}
-            >
-              <img src={item.url} alt="" />
-            </div>
+              onLoadEnd={() => {
+                !loadingEnd &&
+                  index === dataSource.length - 1 &&
+                  setLoadingEnd(true);
+              }}
+            />
           </div>
         ))}
       </div>
@@ -238,6 +234,7 @@ const Home = () => {
       <animated.div style={loadingEndStyle} className={styles.loading}>
         <Loading />
       </animated.div>
+      {!!footerText && <div className={styles.footer}>{footerText}</div>}
     </div>
   );
 };

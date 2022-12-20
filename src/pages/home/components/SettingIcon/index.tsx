@@ -1,23 +1,21 @@
-import type { MouseEventHandler } from 'react';
+import type { FC, MouseEventHandler } from 'react';
 import React, { useState, useCallback, useEffect } from 'react';
 import { IconButton, Upload } from '@/components';
 import { animated, useSpring } from '@react-spring/web';
 import styles from './style.module.scss';
 
-export namespace TSettingIcon {
-  interface SelectOption {
-    type: string;
-    payload?: any;
-  }
-  export interface onSelect {
-    (option: SelectOption): void;
-  }
-  export interface Props {
-    onSelect: onSelect;
-  }
+interface SelectOption {
+  type: string;
+  payload?: any;
+}
+export interface onSettingSelect {
+  (option: SelectOption): void;
+}
+interface SettingIconProps {
+  onSelect: onSettingSelect;
 }
 
-const SettingIcon = ({ onSelect }: TSettingIcon.Props) => {
+const SettingIcon: FC<SettingIconProps> = ({ onSelect }) => {
   const [visible, setVisible] = useState(false);
   const style = useSpring({
     scale: visible ? 1 : 0,
@@ -62,11 +60,13 @@ const SettingIcon = ({ onSelect }: TSettingIcon.Props) => {
         </div>
         {/* <div className={styles.item}>
           <IconButton icon="sousuo" />
-        </div>
+        </div>*/}
         <div className={styles.item}>
-          <IconButton icon="shijian" />
+          <IconButton
+            icon="shijian"
+            onClick={() => onSelect({ type: 'sort' })}
+          />
         </div>
-         */}
         <div className={styles.item}>
           <IconButton
             icon="bofang"

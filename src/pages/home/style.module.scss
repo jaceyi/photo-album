@@ -12,7 +12,6 @@
 
 .container {
   overflow: hidden;
-  margin-bottom: 10px;
 }
 
 .main {
@@ -20,7 +19,7 @@
   padding-top: 50px;
 
   .col {
-    transition: left 0.3s, top 0.3s;
+    transition: all 0.3s;
     display: flex;
     justify-content: center;
 
@@ -28,23 +27,10 @@
       max-width: 100%;
     }
   }
-
-  .photo {
-    display: flex;
-    box-shadow: 0 0 1px rgba($color: #000000, $alpha: 0.23);
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    img {
-      width: 100%;
-    }
-  }
 }
 
 .loading {
-  height: 80px;
+  line-height: 60px;
 }
 
 .error {
@@ -65,4 +51,11 @@
     font-size: 14px;
     text-align: right;
   }
+}
+
+.footer {
+  color: #999;
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 8px;
 }

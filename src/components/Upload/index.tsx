@@ -13,11 +13,18 @@ interface Props {
   children: ReactNode;
 }
 
+interface ImageData {
+  result: string;
+  width: number;
+  height: number;
+}
+
 export const Upload = React.memo<Props>(({ children }) => {
   const { tags = [] } = useConfig('options', {});
 
   const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files || [];
+    if (!e.target.files) return;
+    const fileList = e.target.files;
     const _fileList: File[] = [];
     for (let i = 0; i < fileList.length; i++) {
       const file = fileList[i];
@@ -54,28 +61,46 @@ export const Upload = React.memo<Props>(({ children }) => {
     if (!isOk) return;
     for (let i = 0; i < _fileList.length; i++) {
       const file = _fileList[i];
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      const src: string = await new Promise(reslove => {
-        reader.onload = () => {
-          reslove(reader.result as string);
-        };
-      });
-      const [, suffix] = file.type.split('/');
-      const fileRef = ref(storage, `photos/${day().unix()}.${suffix}`);
-      await uploadString(fileRef, src, 'data_url');
-      const url = await getDownloadURL(fileRef);
-      const photoRef = doc(collection(db, 'photos'));
-      setDoc(
-        photoRef,
-        {
-          url,
-          name: file.name,
-          created: day().unix(),
-          tags: tagValue
-        },
-        { merge: true }
-      );
+      try {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        const { result, width, height }: ImageData = await new Promise(
+          (resolve, reject) => {
+            reader.onload = () => {
+              const image = new Image();
+              const result: string = reader.result as string;
+              image.onload = () => {
+                resolve({
+                  result,
+                  width: image.width,
+                  height: image.height
+                });
+              };
+              image.onerror = reject;
+              image.src = result;
+            };
+          }
+        );
+        const [, suffix] = file.type.split('/');
+        const fileRef = ref(storage, `photos/${day().unix()}.${suffix}`);
+        await uploadString(fileRef, result, 'data_url');
+        const url = await getDownloadURL(fileRef);
+        const photoRef = doc(collection(db, 'photos'));
+        setDoc(
+          photoRef,
+          {
+            url,
+            width,
+            height,
+            name: file.name,
+            created: day().unix(),
+            tags: tagValue
+          },
+          { merge: true }
+        );
+      } catch (e) {
+        AlertConfirm.alert('部分图片上传失败！');
+      }
     }
   };
 

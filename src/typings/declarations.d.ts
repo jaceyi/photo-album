@@ -12,4 +12,17 @@ declare module '*.scss' {
   export = content;
 }
 
-declare module 'macy';
+declare module 'macy' {
+  interface Options {
+    container: HTMLDivElement;
+    margin: number;
+    columns: number;
+  }
+  class Macy {
+    constructor(options: Options);
+    options: Options;
+    recalculate: Function;
+  }
+
+  export = Macy;
+}
