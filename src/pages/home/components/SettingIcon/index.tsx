@@ -1,4 +1,4 @@
-import type { FC, MouseEventHandler } from 'react';
+import type { MouseEventHandler } from 'react';
 import React, { useState, useCallback, useEffect } from 'react';
 import { IconButton, Upload } from '@/components';
 import { animated, useSpring } from '@react-spring/web';
@@ -15,7 +15,7 @@ interface SettingIconProps {
   onSelect: onSettingSelect;
 }
 
-const SettingIcon: FC<SettingIconProps> = ({ onSelect }) => {
+const SettingIcon = React.memo<SettingIconProps>(({ onSelect }) => {
   const [visible, setVisible] = useState(false);
   const style = useSpring({
     scale: visible ? 1 : 0,
@@ -81,6 +81,6 @@ const SettingIcon: FC<SettingIconProps> = ({ onSelect }) => {
       </animated.div>
     </div>
   );
-};
+});
 
 export default SettingIcon;

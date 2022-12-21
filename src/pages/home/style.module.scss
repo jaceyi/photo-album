@@ -22,15 +22,15 @@
     transition: all 0.3s;
     display: flex;
     justify-content: center;
-
-    img {
-      max-width: 100%;
-    }
   }
 }
 
 .loading {
   line-height: 60px;
+}
+
+.delete {
+  margin-right: 10px;
 }
 
 .error {
@@ -48,8 +48,6 @@
 
   div {
     margin-top: 10px;
-    font-size: 14px;
-    text-align: right;
   }
 }
 

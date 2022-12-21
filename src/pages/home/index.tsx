@@ -8,7 +8,7 @@ import React, {
 import { useDidMount } from '@/hooks';
 import styles from './style.module.scss';
 import SettingIcon, { onSettingSelect } from './components/SettingIcon';
-import LoadPhoto, { Photo, PHOTO_MARGIN } from './components/LoadPhoto';
+import LoadPhoto, { Photo } from './components/LoadPhoto';
 import {
   collection,
   onSnapshot,
@@ -19,25 +19,17 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 import { db } from '@/utils/firebase';
-import { useConfig } from '@/hooks';
-import Macy from 'macy';
-import LocalDB from '@/libs/LocalDB';
+import { useConfig, useLocalValue } from '@/hooks';
+import PlanLayout from '@/libs/PlanLayout';
 import { useSpring, animated } from '@react-spring/web';
 import { PhotoSlider } from 'react-photo-view';
 import { TagGroup, IconButton, Loading } from '@/components';
-import AlertConfirm from 'react-alert-confirm';
+import AlertConfirm, { Button } from 'react-alert-confirm';
 
 type Photos = Photo[];
 
 const Home = () => {
-  const { tags = [] } = useConfig('options', {});
-  const [tagValue, setTagValue] = useState<[]>(
-    () => LocalDB.get('tagValue') || []
-  );
-  useEffect(() => {
-    LocalDB.set('tagValue', tagValue);
-  }, [tagValue]);
-
+  // db
   const [data, setData] = useState<Photos>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [footerText, setFooterText] = useState('');
@@ -77,24 +69,70 @@ const Home = () => {
     opacity: loadingEnd ? 0 : 1
   });
 
-  const [layoutCol, setLayoutCol] = useState<number>(
-    () => LocalDB.get('layoutCol') || 2
-  );
+  // layout
+  const mainRef = useRef(null);
+  const [planLayout, setPlanLayout] = useState<PlanLayout>();
+  const [layoutCol, setLayoutCol] = useLocalValue<number>('layoutCol', 2);
   useEffect(() => {
-    LocalDB.set('layoutCol', layoutCol);
+    if (!mainRef.current) return;
+    setPlanLayout(
+      new PlanLayout({
+        container: mainRef.current,
+        columns: layoutCol,
+        margin: 10
+      })
+    );
   }, [layoutCol]);
-  const [tagVisible, setTagVisible] = useState<boolean>(
-    () => LocalDB.get('tagVisible') || false
+
+  // tag
+  const [tagVisible, setTagVisible] = useLocalValue<boolean>(
+    'tagVisible',
+    false
   );
-  useEffect(() => {
-    LocalDB.set('tagVisible', tagVisible);
-  }, [tagVisible]);
   const tagStyles = useSpring({
     y: tagVisible ? 0 : -60
   });
+  const { tags = [] } = useConfig('options', {});
+  const [tagValue, setTagValue] = useLocalValue<[]>('tagValue', []);
+  const dataSource = useMemo(() => {
+    if (!tagValue.length) return data;
+    return data.filter(item => tagValue.find(tag => item.tags.includes(tag)));
+  }, [data, tagValue]);
+
+  useEffect(() => {
+    if (!planLayout) return;
+    if (dataSource.length) {
+      planLayout.dispatchComputeBefore();
+      planLayout.recalculate(true);
+      planLayout.dispatchComputeAfter();
+    }
+  }, [dataSource, planLayout]);
+
+  // view and play
+  const playTimer = useRef<number>(0);
   const [visible, setVisible] = useState(false);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  useEffect(() => {
+    if (dataSource.length) {
+      setLoadingEnd(false);
+      setIndex(index => {
+        if (dataSource[index]) return index;
+        return index - 1;
+      });
+    }
+    if (visible && playing) {
+      clearInterval(playTimer.current);
+      playTimer.current = window.setInterval(() => {
+        setIndex(i => (i === dataSource.length - 1 ? 0 : i + 1));
+      }, 3000);
+      return;
+    }
+    if (!visible && playing) {
+      clearInterval(playTimer.current);
+      setPlaying(false);
+    }
+  }, [visible, playing, dataSource]);
 
   const handleSetting = useCallback<onSettingSelect>(({ type }) => {
     switch (type) {
@@ -117,53 +155,11 @@ const Home = () => {
     }
   }, []);
 
-  const macyRef = useRef<Macy>();
-  const mainRef = useRef(null);
-  useEffect(() => {
-    if (!mainRef.current) return;
-    const macy: any = new Macy({
-      container: mainRef.current,
-      columns: layoutCol,
-      margin: PHOTO_MARGIN
-    });
-    macyRef.current = macy;
-  }, [layoutCol]);
-
-  const dataSource = useMemo(() => {
-    if (!tagValue.length) return data;
-    return data.filter(item => tagValue.find(tag => item.tags.includes(tag)));
-  }, [data, tagValue]);
-
-  useEffect(() => {
-    if (!macyRef.current) return;
-    if (dataSource.length) {
-      setIndex(index => {
-        if (dataSource[index]) return index;
-        return index - 1;
-      });
-      macyRef.current.recalculate(true);
-    }
-  }, [dataSource, macyRef.current]);
-
-  const playTimer = useRef<number>(0);
-  useEffect(() => {
-    setLoadingEnd(false);
-
-    if (visible && playing) {
-      clearInterval(playTimer.current);
-      playTimer.current = window.setInterval(() => {
-        setIndex(i => (i === dataSource.length - 1 ? 0 : i + 1));
-      }, 3000);
-      return;
-    }
-    if (!visible && playing) {
-      clearInterval(playTimer.current);
-      setPlaying(false);
-    }
-  }, [visible, playing, dataSource]);
-
   const handleDelete = async () => {
-    const [isOk] = await AlertConfirm('确认删除该照片？');
+    const [isOk] = await AlertConfirm({
+      title: '确认删除该照片？',
+      desc: '删除后也可以再恢复哦~'
+    });
     if (isOk) {
       const active = data[index];
       if (!active) return;
@@ -177,7 +173,9 @@ const Home = () => {
         <h2>错误：</h2>
         <p>{errorMessage}</p>
         <div>
-          <a href="/">返回重试</a>
+          <Button styleType="danger" onClick={() => (window as any).signOut()}>
+            退出登录
+          </Button>
         </div>
       </div>
     );
@@ -195,10 +193,10 @@ const Home = () => {
       </div>
       <div ref={mainRef} className={styles.main}>
         {dataSource.map((item, index) => (
-          <div key={`${item.id}-${index}`} className={styles.col}>
+          <div key={item.id} className={styles.col}>
             <LoadPhoto
               data={item}
-              layoutCol={layoutCol}
+              planLayout={planLayout}
               onClick={() => {
                 setVisible(true);
                 setIndex(index);
@@ -225,7 +223,7 @@ const Home = () => {
         onIndexChange={setIndex}
         toolbarRender={() => {
           return (
-            <div style={{ marginRight: 10 }}>
+            <div className={styles.delete}>
               <IconButton onClick={handleDelete} icon="qingchu" size={38} />
             </div>
           );

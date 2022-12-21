@@ -2,8 +2,38 @@
   display: flex;
   box-shadow: 0 0 1px rgba($color: #000000, $alpha: 0.23);
   width: 100%;
+  position: relative;
 
   img {
     width: 100%;
+  }
+
+  .loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: -1;
+    font-size: 42px;
+    transform: translateX(-50%) translateY(-50%);
+    filter: grayscale(1);
+    opacity: 0.3;
+    animation: 1s linear 0s infinite normal grayscale;
+
+    @keyframes grayscale {
+      0% {
+        opacity: 0.3;
+        filter: grayscale(1);
+      }
+
+      50% {
+        opacity: 0.9;
+        filter: grayscale(0.1);
+      }
+
+      100% {
+        opacity: 0.3;
+        filter: grayscale(1);
+      }
+    }
   }
 }
