@@ -127,7 +127,7 @@ const Home = () => {
       clearInterval(playTimer.current);
       playTimer.current = window.setInterval(() => {
         setIndex(i => (i === dataSource.length - 1 ? 0 : i + 1));
-      }, 3000);
+      }, 3600);
       return;
     }
     if (!visible && playing) {
@@ -151,6 +151,7 @@ const Home = () => {
       case 'play':
         setVisible(true);
         setPlaying(true);
+        break;
       case 'sort':
         setOrder(v => !v);
         break;
@@ -213,9 +214,9 @@ const Home = () => {
         ))}
       </div>
       <PhotoSlider
-        images={dataSource.map((item, index) => ({
+        images={dataSource.map(item => ({
           src: item.url,
-          key: `${item.id}-${index}`
+          key: item.id
         }))}
         visible={visible}
         onClose={() => {
@@ -225,8 +226,11 @@ const Home = () => {
         onIndexChange={setIndex}
         toolbarRender={() => {
           return (
-            <div className={styles.delete}>
-              <IconButton onClick={handleDelete} icon="qingchu" size={38} />
+            <div className={styles.sliderHeader}>
+              {playing && <span className={styles.tip}>自动播放中</span>}
+              <div className={styles.delete}>
+                <IconButton onClick={handleDelete} icon="qingchu" size={38} />
+              </div>
             </div>
           );
         }}
