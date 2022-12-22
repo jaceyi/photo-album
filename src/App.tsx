@@ -11,7 +11,7 @@ const App = () => {
   const [user, setUser] = useState<User>();
   useEffect(() => {
     if (user) {
-      navigate('/home');
+      navigate('/home', { replace: true });
     }
   }, [user]);
 
@@ -21,7 +21,7 @@ const App = () => {
         (window as any).signOut = () => signOut(auth);
         setUser(user);
       } else {
-        navigate('/');
+        navigate('/', { replace: true });
       }
     });
   });
