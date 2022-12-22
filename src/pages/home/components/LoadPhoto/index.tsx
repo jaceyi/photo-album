@@ -83,7 +83,7 @@ const LoadPhoto: FC<Props> = ({ data, planLayout, onLoadEnd, ...props }) => {
   };
   useEffect(() => {
     if (loadEndStatus) onLoadEnd();
-  }, [loadEndStatus, onLoadEnd]);
+  });
 
   return (
     <div ref={ref} className={styles.photo}>

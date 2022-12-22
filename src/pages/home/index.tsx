@@ -84,7 +84,7 @@ const Home = () => {
     );
   }, [layoutCol]);
 
-  // tag
+  // filter and order
   const [tagVisible, setTagVisible] = useLocalValue<boolean>(
     'tagVisible',
     false
@@ -94,10 +94,13 @@ const Home = () => {
   });
   const { tags = [] } = useConfig('options', {});
   const [tagValue, setTagValue] = useLocalValue<[]>('tagValue', []);
+  const [order, setOrder] = useLocalValue<boolean>('order', false);
   const dataSource = useMemo(() => {
-    if (!tagValue.length) return data;
-    return data.filter(item => tagValue.find(tag => item.tags.includes(tag)));
-  }, [data, tagValue]);
+    setLoadingEnd(false);
+    const _data = order ? [...data].reverse() : data;
+    if (!tagValue.length) return _data;
+    return _data.filter(item => tagValue.find(tag => item.tags.includes(tag)));
+  }, [data, order, tagValue]);
 
   useEffect(() => {
     if (!planLayout) return;
@@ -115,7 +118,6 @@ const Home = () => {
   const [playing, setPlaying] = useState(false);
   useEffect(() => {
     if (dataSource.length) {
-      setLoadingEnd(false);
       setIndex(index => {
         if (dataSource[index]) return index;
         return index - 1;
@@ -150,7 +152,7 @@ const Home = () => {
         setVisible(true);
         setPlaying(true);
       case 'sort':
-        setData(data => [...data.reverse()]);
+        setOrder(v => !v);
         break;
     }
   }, []);
