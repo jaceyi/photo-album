@@ -164,7 +164,7 @@ const Home = () => {
       desc: '删除后也可以再恢复哦~'
     });
     if (isOk) {
-      const active = data[index];
+      const active = dataSource[index];
       if (!active) return;
       deleteDoc(doc(db, 'photos', active.id));
     }
